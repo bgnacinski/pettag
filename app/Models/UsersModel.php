@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use App\Entities\UserEntity;
 
 class UsersModel extends Model
 {
     protected $table            = 'users';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
-    protected $returnType       = 'array';
+    protected $returnType       = UserEntity::class;
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = ["email_address", "password", "phone_number", "auth_key", "permission_level"];
@@ -49,5 +50,24 @@ class UsersModel extends Model
         $data["data"]["auth_key"] = $auth_key;
 
         return $data;
+    }
+
+    public function login(string $email_addr, string $password) :array{
+        $result = $this->where("email_address", $email_addr)->first();
+
+        if($result){
+            if(password_verify($password, $result->password)){
+                return [
+                    "status"=> true, 
+                    "auth_key" => $result->auth_key
+                ];
+            }
+            else{
+                return ["status" => false];
+            }
+        }
+        else{
+            return ["status" => false];
+        }
     }
 }
