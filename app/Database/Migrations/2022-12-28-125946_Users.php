@@ -26,6 +26,7 @@ class Users extends Migration
             "phone_number" => [
                 "type" => "varchar",
                 "constraint" => 20,
+                "unique" => true,
                 "null" => true
             ],
             "auth_key" => [
