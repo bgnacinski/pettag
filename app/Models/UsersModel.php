@@ -45,7 +45,7 @@ class UsersModel extends Model
     }
 
     public function generateAuthKey(array $data) :array{
-        $auth_key = bin2hex(random_bytes(256));
+        $auth_key = hash("sha256", random_bytes(512));
 
         $data["data"]["auth_key"] = $auth_key;
 
@@ -91,7 +91,7 @@ class UsersModel extends Model
         $this->insert($new_user);
 
         return [
-            "success" => true,
+            "success" => true
         ];
     }
 }
