@@ -22,8 +22,31 @@ class UsersModel extends Model
     protected $updatedField  = 'updated_at';
 
     // Validation
-    protected $validationRules      = [];
-    protected $validationMessages   = [];
+    protected $validationRules      = [
+        "email_address" => "required|is_unique[users.email_address]|valid_email",
+        "password" => "required|min_length[8]",
+        "password_conf" => "required|matches[password]",
+        "phone_number" => "required|regex_match[^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$]" // todo: to re-consider
+    ];
+    protected $validationMessages   = [
+        "email_address" => [
+            "required" => "Email address is required.",
+            "is_unique" => "This email address is already taken.",
+            "valid_email" => "This email address isn't valid."
+        ],
+        "password" => [
+            "required" => "Password is required.",
+            "min_length" => "Minimum length of password is 8 characters."
+        ],
+        "password_conf" => [
+            "required" => "Password confirmation is required.",
+            "matches" => "Passwords do not match."
+        ],
+        "phone_number" => [
+            "required" => "Phone number is required.",
+            "regex_match" => "Phone number did not pass our validation."
+        ]
+    ];
     protected $skipValidation       = false;
     protected $cleanValidationRules = true;
 
@@ -79,19 +102,24 @@ class UsersModel extends Model
     }
 
     public function newUser(array $input){
-        if($this->login($input["email_addr"], $input["password"])["exists"]){ // user exists
+        $result = $this->validate($input);
+
+        if(!$result){
             return [
                 "success" => false,
-                "msg" => "This email address is already taken."
+                "errors" => $this->errors()
             ];
         }
+        else{
+            $new_user = new UserEntity($input);
 
-        $new_user = new UserEntity($input);
+            $this->insert($new_user);
+            $new_user = $this->find($this->insertID);
 
-        $this->insert($new_user);
-
-        return [
-            "success" => true
-        ];
+            return [
+                "success" => true,
+                "user_data" => $new_user
+            ];
+        }
     }
 }
