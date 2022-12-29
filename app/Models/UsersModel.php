@@ -58,16 +58,40 @@ class UsersModel extends Model
         if($result){
             if(password_verify($password, $result->password)){
                 return [
-                    "status"=> true, 
-                    "auth_key" => $result->auth_key
+                    "success"=> true, 
+                    "auth_key" => $result->auth_key,
+                    "exists" => true // propably(~100%) will never be used
                 ];
             }
             else{
-                return ["status" => false];
+                return [
+                    "success" => false,
+                    "exists" => true
+                ];
             }
         }
         else{
-            return ["status" => false];
+            return [
+                "success" => false, 
+                "exists" => false
+            ];
         }
+    }
+
+    public function newUser(array $input){
+        if($this->login($input["email_addr"], $input["password"])["exists"]){ // user exists
+            return [
+                "success" => false,
+                "msg" => "This email address is already taken."
+            ];
+        }
+
+        $new_user = new UserEntity($input);
+
+        $this->insert($new_user);
+
+        return [
+            "success" => true,
+        ];
     }
 }
