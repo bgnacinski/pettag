@@ -2,6 +2,7 @@
 
 namespace App\Database\Seeds;
 
+use App\Models\BreedsModel;
 use CodeIgniter\Database\Seeder;
 
 class BreedsSeeder extends Seeder
