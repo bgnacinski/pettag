@@ -41,6 +41,7 @@ $routes->group("api", function($routes){
     $routes->group("v1", ["namespace" => "App\Controllers\Api\V1"],function($routes){
         $routes->group("users", function($routes){
             $routes->post("login", "Users::index");
+            $routes->post("register", "Users::register");
         });
     });
 });
